@@ -6,6 +6,8 @@ const App = () => {
 
   const { good, neutral, bad } = feedback;
 
+  const getTotal = () => good + neutral + bad;
+
   return (
     <div>
       <h2>give feedback</h2>
@@ -24,6 +26,9 @@ const App = () => {
       <p>good {good}</p>
       <p>neutral {neutral} </p>
       <p>bad {bad} </p>
+      <p>all {getTotal()}</p>
+      <p>average {getTotal() / 3}</p>
+      <p>positive {(good * 100) / getTotal()} %</p>
     </div>
   );
 };
