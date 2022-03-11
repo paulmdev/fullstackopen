@@ -5,8 +5,7 @@ const App = () => {
   const [feedback, setFeedback] = useState({ good: 0, neutral: 0, bad: 0 });
 
   const { good, neutral, bad } = feedback;
-
-  const getTotal = () => good + neutral + bad;
+  const getTotalFeedback = () => good + neutral + bad;
 
   return (
     <div>
@@ -23,13 +22,21 @@ const App = () => {
         bad
       </button>
       <h2>stadistics</h2>
+      <Statistics {...feedback} getTotalFeedback={getTotalFeedback} />
+    </div>
+  );
+};
+
+const Statistics = ({ good, neutral, bad, getTotalFeedback }) => {
+  return (
+    <>
       <p>good {good}</p>
       <p>neutral {neutral} </p>
       <p>bad {bad} </p>
-      <p>all {getTotal()}</p>
-      <p>average {getTotal() / 3}</p>
-      <p>positive {(good * 100) / getTotal()} %</p>
-    </div>
+      <p>all {getTotalFeedback()}</p>
+      <p>average {getTotalFeedback() / 3}</p>
+      <p>positive {(good * 100) / getTotalFeedback()} %</p>
+    </>
   );
 };
 
