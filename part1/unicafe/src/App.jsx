@@ -40,23 +40,26 @@ const Statistics = ({ good, neutral, bad, getTotalFeedback }) => {
   const getPositiveFeedbackPercentage = () => (good * 100) / getTotalFeedback();
 
   return (
-    <>
-      <StadisticLine value={good}>good</StadisticLine>
-      <StadisticLine value={neutral}>neutral</StadisticLine>
-      <StadisticLine value={bad}>bad</StadisticLine>
-      <StadisticLine value={getTotalFeedback()}>all</StadisticLine>
-      <StadisticLine value={getAverageFeedback()}>average</StadisticLine>
-      <StadisticLine value={getPositiveFeedbackPercentage() + '%'}>
-        positive
-      </StadisticLine>
-    </>
+    <table>
+      <tbody>
+        <StadisticLine value={good}>good</StadisticLine>
+        <StadisticLine value={neutral}>neutral</StadisticLine>
+        <StadisticLine value={bad}>bad</StadisticLine>
+        <StadisticLine value={getTotalFeedback()}>all</StadisticLine>
+        <StadisticLine value={getAverageFeedback()}>average</StadisticLine>
+        <StadisticLine value={getPositiveFeedbackPercentage() + '%'}>
+          positive
+        </StadisticLine>
+      </tbody>
+    </table>
   );
 };
 
 const StadisticLine = ({ value, children }) => (
-  <p>
-    {children} {value}
-  </p>
+  <tr>
+    <td>{children}</td>
+    <td>{value}</td>
+  </tr>
 );
 
 export default App;
