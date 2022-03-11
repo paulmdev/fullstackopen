@@ -22,7 +22,11 @@ const App = () => {
         bad
       </button>
       <h2>stadistics</h2>
-      <Statistics {...feedback} getTotalFeedback={getTotalFeedback} />
+      {getTotalFeedback() === 0 ? (
+        <p>No feedback given</p>
+      ) : (
+        <Statistics {...feedback} getTotalFeedback={getTotalFeedback} />
+      )}
     </div>
   );
 };
