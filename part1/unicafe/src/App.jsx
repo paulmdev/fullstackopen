@@ -10,17 +10,17 @@ const App = () => {
   return (
     <div>
       <h2>give feedback</h2>
-      <button onClick={() => setFeedback({ ...feedback, good: good + 1 })}>
+      <Button onClick={() => setFeedback({ ...feedback, good: good + 1 })}>
         good
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={() => setFeedback({ ...feedback, neutral: neutral + 1 })}
       >
         neutral
-      </button>
-      <button onClick={() => setFeedback({ ...feedback, bad: bad + 1 })}>
+      </Button>
+      <Button onClick={() => setFeedback({ ...feedback, bad: bad + 1 })}>
         bad
-      </button>
+      </Button>
       <h2>stadistics</h2>
       {getTotalFeedback() === 0 ? (
         <p>No feedback given</p>
@@ -31,17 +31,32 @@ const App = () => {
   );
 };
 
+const Button = ({ onClick, children }) => (
+  <button onClick={onClick}>{children}</button>
+);
+
 const Statistics = ({ good, neutral, bad, getTotalFeedback }) => {
+  const getAverageFeedback = () => getTotalFeedback() / 3;
+  const getPositiveFeedbackPercentage = () => (good * 100) / getTotalFeedback();
+
   return (
     <>
-      <p>good {good}</p>
-      <p>neutral {neutral} </p>
-      <p>bad {bad} </p>
-      <p>all {getTotalFeedback()}</p>
-      <p>average {getTotalFeedback() / 3}</p>
-      <p>positive {(good * 100) / getTotalFeedback()} %</p>
+      <StadisticLine value={good}>good</StadisticLine>
+      <StadisticLine value={neutral}>neutral</StadisticLine>
+      <StadisticLine value={bad}>bad</StadisticLine>
+      <StadisticLine value={getTotalFeedback()}>all</StadisticLine>
+      <StadisticLine value={getAverageFeedback()}>average</StadisticLine>
+      <StadisticLine value={getPositiveFeedbackPercentage() + '%'}>
+        positive
+      </StadisticLine>
     </>
   );
 };
+
+const StadisticLine = ({ value, children }) => (
+  <p>
+    {children} {value}
+  </p>
+);
 
 export default App;
