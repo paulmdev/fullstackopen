@@ -12,25 +12,41 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
-  const [votes, setVotes] = useState(new Uint8Array(10));
+  const [voteState, setVoteState] = useState({
+    voteArray: new Uint8Array(anecdotes.length),
+    mostVoted: {
+      index: 0,
+      count: 0,
+    },
+  });
 
   const getNextAnecdote = () =>
     setSelected(Math.floor(Math.random() * anecdotes.length));
 
   const voteAnecdote = () => {
-    const votesCopy = [...votes];
+    const voteArray = [...voteState.voteArray];
 
-    votesCopy[selected]++;
+    voteArray[selected]++;
 
-    setVotes(votesCopy);
+    if (voteArray[selected] > voteState.mostVoted.count) {
+      setVoteState({
+        voteArray,
+        mostVoted: { index: selected, count: voteArray[selected] },
+      });
+    } else {
+      setVoteState({ ...voteState, voteArray });
+    }
   };
 
   return (
     <main>
+      <h1>Anecdote of the day</h1>
       <div>{anecdotes[selected]}</div>
-      <p>has {votes[selected]} votes</p>
+      <p>has {voteState[selected]} votes</p>
       <button onClick={voteAnecdote}>vote</button>
       <button onClick={getNextAnecdote}>next anecdote</button>
+      <h2>Anecdote with most votes</h2>
+      <p>{anecdotes[voteState.mostVoted.index]}</p>
     </main>
   );
 };
