@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import InputForm from './components/InputForm';
+import ContactFilter from './components/ContactFilter';
+import ContactList from './components/ContactList';
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -10,6 +13,11 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+
+  const formValues = {
+    newName,
+    newNumber,
+  };
 
   const handleSubmitEvent = (event) => {
     event.preventDefault();
@@ -29,11 +37,14 @@ const App = () => {
     setNewNumber('');
   };
 
+  const formHandlers = {
+    handleNameChange: (event) => setNewName(event.target.value),
+    handleNumberChange: (event) => setNewNumber(event.target.value),
+    handleSubmitEvent,
+  };
+
   const isNameDuplicated = () =>
     persons.find((person) => person.name == newName);
-
-  const handleNameChange = (event) => setNewName(event.target.value);
-  const handleNumberChange = (event) => setNewNumber(event.target.value);
 
   const handleFilterChange = (event) =>
     setFilter(event.target.value.toLowerCase());
@@ -41,32 +52,11 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <div>
-        filter shown with{' '}
-        <input onChange={handleFilterChange} value={filter} type="text" />{' '}
-      </div>
+      <ContactFilter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
-      <form onSubmit={handleSubmitEvent}>
-        <div>
-          name: <input onChange={handleNameChange} value={newName} />
-        </div>
-        <div>
-          number: <input onChange={handleNumberChange} value={newNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <InputForm {...formValues} {...formHandlers} />
       <h2>Numbers</h2>
-      <ul>
-        {persons
-          .filter((person) => person.name.toLowerCase().includes(filter))
-          .map((person) => (
-            <li key={person.name}>
-              {person.name} {person.number}
-            </li>
-          ))}
-      </ul>
+      <ContactList persons={persons} filter={filter} />
     </div>
   );
 };
