@@ -1,45 +1,52 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+interface RestCountriesResponse {
+  name: {
+    common: string;
+    official: string;
+    nativeName: string;
+  };
 }
 
-export default App
+function App() {
+  const [query, setQuery] = useState("");
+  const [countries, setCountries] = useState<RestCountriesResponse[]>([]);
+
+  useEffect(() => {
+    axios
+      .get<RestCountriesResponse[]>("https://restcountries.com/v3.1/all")
+      .then((response) => setCountries(response.data));
+  }, []);
+
+  const countriesByQuery = useMemo(
+    () =>
+      countries.filter((country) =>
+        country.name.common.toLowerCase().includes(query.toLowerCase())
+      ),
+    [query]
+  );
+
+  return (
+    <>
+      <label htmlFor="search-bar">find countries</label>
+      <input
+        type="text"
+        id="search-bar"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <ul>
+        {query.length !== 0 && countriesByQuery.length > 10 ? (
+          <p>Too many matches, specify another filter</p>
+        ) : (
+          countriesByQuery.map((country) => (
+            <li key={country.name.common}>{country.name.common}</li>
+          ))
+        )}
+      </ul>
+    </>
+  );
+}
+
+export default App;
