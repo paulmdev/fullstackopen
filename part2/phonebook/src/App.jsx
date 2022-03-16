@@ -7,6 +7,11 @@ const App = () => {
   const handleSubmitEvent = (event) => {
     event.preventDefault();
 
+    if (isNameDuplicated()) {
+      alert(`${newName} is already added to the phonebook`);
+      return;
+    }
+
     const phonebookEntry = {
       name: newName,
     };
@@ -14,6 +19,9 @@ const App = () => {
     setPersons([...persons, phonebookEntry]);
     setNewName('');
   };
+
+  const isNameDuplicated = () =>
+    persons.find((person) => person.name == newName);
 
   const handleNameChange = (event) => setNewName(event.target.value);
 
