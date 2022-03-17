@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { RestCountriesResponse } from "./types/RestCountriesResponse";
 import CountryOverview from "./components/CountryOverview";
+import CountryListItem from "./components/CountryListItem";
 
 function App() {
   const [query, setQuery] = useState("");
@@ -23,8 +24,14 @@ function App() {
 
   const renderCountries = () =>
     countriesByQuery.map((country) => (
-      <li key={country.name.common}>{country.name.common}</li>
+      <CountryListItem key={country.name.official} country={country} />
     ));
+
+  const renderBody = (length: number) => {
+    if (length === 1) return <CountryOverview country={countriesByQuery[0]} />;
+    else if (length > 1) return <ul>{renderCountries()}</ul>;
+    else return <p>Too many matches, specify another filter</p>;
+  };
 
   return (
     <>
@@ -35,13 +42,7 @@ function App() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
-      {query.length !== 0 && countriesByQuery.length > 10 ? (
-        <p>Too many matches, specify another filter</p>
-      ) : countriesByQuery.length === 1 ? (
-        <CountryOverview country={countriesByQuery[0]} />
-      ) : (
-        <ul>{renderCountries()}</ul>
-      )}
+      {query !== "" && renderBody(countriesByQuery.length)}
     </>
   );
 }
