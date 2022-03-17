@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { RestCountriesResponse } from "./RestCountriesResponse";
+import { RestCountriesResponse } from "./types/RestCountriesResponse";
 import CountryOverview from "./components/CountryOverview";
 
 function App() {

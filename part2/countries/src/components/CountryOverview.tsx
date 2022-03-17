@@ -1,5 +1,5 @@
 import React from "react";
-import { RestCountriesResponse } from "../RestCountriesResponse";
+import { RestCountriesResponse } from "../types/RestCountriesResponse";
 
 const CountryOverview: React.FC<{ country: RestCountriesResponse }> = ({
   country: {
