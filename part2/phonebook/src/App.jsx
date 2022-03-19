@@ -3,15 +3,21 @@ import InputForm from "./components/InputForm";
 import ContactFilter from "./components/ContactFilter";
 import ContactList from "./components/ContactList";
 import phonebookService from "./services/phonebookService";
+import Notification from "./components/Notification";
+import useNotification from "./hooks/useNotification";
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useNotification();
 
   useEffect(() => {
-    phonebookService.getAll().then((contacts) => setContacts(contacts));
+    phonebookService
+      .getAll()
+      .then((contacts) => setContacts(contacts))
+      .catch((error) => setNotification({ message: error, isError: true }));
   }, []);
 
   const formValues = {
@@ -28,12 +34,8 @@ const App = () => {
     };
 
     if (isNameDuplicated(newName)) {
-      if (
-        !confirm(
-          `${newName} is already added to the phonebook, replace the old number with a new one?`
-        )
-      )
-        return;
+      const confirmMessage = `${newName} is already added to the phonebook, replace the old number with a new one?`;
+      if (!confirm(confirmMessage)) return;
 
       const contactId = getIdByName(newName);
 
@@ -44,12 +46,22 @@ const App = () => {
             (contactItem) => contactItem.id !== contactId
           );
           setContacts([...newContacts, changedContact]);
-        });
+          setNotification({
+            message: `Changed ${changedContact.name} number to ${changedContact.number}.`,
+          });
+        })
+        .catch(() =>
+          setNotification({
+            isError: true,
+            message: `Information of ${contact.name} has already been removed from the server.`,
+          })
+        );
     }
 
-    phonebookService
-      .createContact(contact)
-      .then((newContact) => setContacts([...contacts, newContact]));
+    phonebookService.createContact(contact).then((newContact) => {
+      setContacts([...contacts, newContact]);
+      setNotification({ message: `Added ${newContact.name}.` });
+    });
     setNewName("");
     setNewNumber("");
   };
@@ -82,6 +94,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification {...notification} />
       <ContactFilter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
       <InputForm {...formValues} {...formHandlers} />
@@ -90,6 +103,7 @@ const App = () => {
         contacts={contacts}
         filter={filter}
         setContacts={setContacts}
+        setNotification={setNotification}
       />
     </div>
   );
