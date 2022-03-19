@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react";
 
-const ContactFilter = ({filter, handleFilterChange}) => {
+const ContactFilter = ({ filter, handleFilterChange }) => {
   return (
-      <div>
-        filter shown with{' '}
-        <input onChange={handleFilterChange} value={filter} type="text" />{' '}
-      </div>
-  )
-}
+    <div>
+      filter shown with{" "}
+      <input onChange={handleFilterChange} value={filter} type="text" />{" "}
+    </div>
+  );
+};
 
-export default ContactFilter
+export default ContactFilter;
