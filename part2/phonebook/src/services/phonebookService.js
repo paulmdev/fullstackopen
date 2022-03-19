@@ -30,7 +30,8 @@ const getOne = (id) =>
  * @param contact {{id?: number; name: string; number: string}}
  * @returns {Promise<{id: number; name: string; number: string}>}
  */
-const changeOne = (id, contact) => axios.put(`${baseUrl}/${id}`, contact);
+const changeOne = (id, contact) =>
+  axios.put(`${baseUrl}/${id}`, contact).then((response) => response.data);
 
 /**
  * Deletes a contact whose id matches the given id.
