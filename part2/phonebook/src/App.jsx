@@ -34,7 +34,7 @@ const App = () => {
 
     phonebookService
       .createContact(contact)
-      .then(() => setContacts([...contacts, contact]));
+      .then((newContact) => setContacts([...contacts, newContact]));
     setNewName("");
     setNewNumber("");
   };
