@@ -10,7 +10,9 @@ const ContactList = ({ contacts, filter, setContacts }) => {
     phonebookService
       .deleteOne(contact.id)
       .then(() =>
-        setContacts(contacts.filter((contact) => contact.id !== contact.id))
+        setContacts(
+          contacts.filter((oldContact) => oldContact.id !== contact.id)
+        )
       );
 
   return (
