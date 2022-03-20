@@ -40,10 +40,28 @@ app.get("/api/persons", (req, res) => res.status(200).send(data).end());
 app.get("/api/persons/:id", (req, res) => {
   const { id } = req.params;
 
-  const person = data.find(person => person.id === Number(id));
+  const person = data.find((person) => person.id === Number(id));
 
   if (person) return res.status(200).json(person);
   return res.sendStatus(404);
+});
+
+app.post("/api/persons", (req, res) => {
+  const { body } = req;
+  if (!body.name || !body.number)
+    return res.status(400).json({ error: "Content Missing" });
+
+  const { name, number } = body;
+
+  const person = {
+    name,
+    number,
+    id: Math.floor(Math.random() * 99999999999999999),
+  };
+
+  data.push(person);
+
+  return res.json(person);
 });
 
 const PORT = process.env.PORT || 3001;
