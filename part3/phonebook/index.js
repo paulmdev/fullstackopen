@@ -4,7 +4,7 @@ const app = Express();
 
 app.use(Express.json());
 
-const data = [
+let data = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -62,6 +62,18 @@ app.post("/api/persons", (req, res) => {
   data.push(person);
 
   return res.json(person);
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const { id } = req.params;
+
+  const person = data.find((person) => person.id === id);
+
+  if (!person) return res.sendStatus(404);
+
+  data = data.filter((person) => person.id !== id);
+
+  return res.sendStatus(204);
 });
 
 const PORT = process.env.PORT || 3001;
