@@ -33,30 +33,7 @@ const App = () => {
       number: newNumber,
     };
 
-    if (isNameDuplicated(newName)) {
-      const confirmMessage = `${newName} is already added to the phonebook, replace the old number with a new one?`;
-      if (!confirm(confirmMessage)) return;
-
-      const contactId = getIdByName(newName);
-
-      return phonebookService
-        .changeOne(contactId, contact)
-        .then((changedContact) => {
-          const newContacts = contacts.filter(
-            (contactItem) => contactItem.id !== contactId
-          );
-          setContacts([...newContacts, changedContact]);
-          setNotification({
-            message: `Changed ${changedContact.name} number to ${changedContact.number}.`,
-          });
-        })
-        .catch(() =>
-          setNotification({
-            isError: true,
-            message: `Information of ${contact.name} has already been removed from the server.`,
-          })
-        );
-    }
+    if (isNameDuplicated(newName)) return modifyContact(contact);
 
     phonebookService.createContact(contact).then((newContact) => {
       setContacts([...contacts, newContact]);
@@ -66,12 +43,43 @@ const App = () => {
     setNewNumber("");
   };
 
+  const modifyContact = async (newContact) => {
+    // Wraps the HTTP request with error handling.
+    const submitRequest = async () => {
+      try {
+        return await phonebookService.changeOne(contactId, newContact);
+      } catch {
+        setNotification({
+          isError: true,
+          message: `Information of ${newContact.name} has already been removed from the server.`,
+        });
+      }
+    };
+
+    const confirmMessage = `${newContact.name} is already added to the phonebook, replace the old number with a new one?`;
+    if (!confirm(confirmMessage)) return;
+
+    const contactId = getContactIdByName(newContact.name);
+
+    const changedContact = await submitRequest();
+
+    const oldContacts = contacts.filter(
+      (contactItem) => contactItem.id !== contactId
+    );
+
+    setNotification({
+      message: `Changed ${changedContact.name} number to ${changedContact.number}.`,
+    });
+
+    setContacts([...oldContacts, changedContact]);
+  };
+
   /**
    * Gets an id of a contact that matches the given name.
    * @param name {string}
    * @returns {int}
    */
-  const getIdByName = (name) =>
+  const getContactIdByName = (name) =>
     contacts.find((contact) => contact.name === name).id;
 
   /**
