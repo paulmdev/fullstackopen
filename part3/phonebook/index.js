@@ -35,8 +35,15 @@ app.get("/info", (req, res) => {
   return res.status(200).send(phonebookInfo).end();
 });
 
-app.get("/api/persons", (req, res) => {
-  return res.status(200).send(data).end();
+app.get("/api/persons", (req, res) => res.status(200).send(data).end());
+
+app.get("/api/persons/:id", (req, res) => {
+  const { id } = req.params;
+
+  const person = data.find(person => person.id === Number(id));
+
+  if (person) return res.status(200).json(person);
+  return res.sendStatus(404);
 });
 
 const PORT = process.env.PORT || 3001;
