@@ -10,6 +10,7 @@ app.use(
 );
 app.use(Express.json());
 app.use(cors());
+app.use(Express.static("dist"));
 
 let data = [
   {

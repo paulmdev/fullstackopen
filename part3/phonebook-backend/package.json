@@ -8,7 +8,9 @@
     "start": "node index.js",
     "serve": "nodemon index.js",
     "deploy:logs": "heroku logs -t",
-    "deploy": "git push heroku master"
+    "deploy": "git push heroku master",
+    "deploy:full": "yarn build:ui && git add . && git commit -m 'deploy app' && yarn deploy",
+    "build:ui": "rm -rf dist && cd ../phonebook && yarn build && mv dist ../phonebook-backend"
   },
   "keywords": [],
   "author": "",
