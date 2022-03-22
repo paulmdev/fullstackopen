@@ -6,12 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "serve": "nodemon index.js"
+    "serve": "nodemon index.js",
+    "deploy:logs": "heroku logs -t",
+    "deploy": "git push heroku master"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "heroku": "^7.59.4",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.0"
   },
