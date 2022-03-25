@@ -1,6 +1,8 @@
+require("dotenv").config();
 const Express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/Person");
 
 const app = Express();
 
@@ -12,46 +14,39 @@ app.use(Express.json());
 app.use(cors());
 app.use(Express.static("dist"));
 
-let data = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 app.get("/info", (req, res) => {
-  const phonebookInfo = `
-    <p>The phonebook has info for ${data.length} people</p>
+  Person.find({})
+    .count()
+    .then((data) => {
+      const phonebookInfo = `
+    <p>The phonebook has info for ${data} people</p>
     <p>${new Date()}</p>
 `;
-  return res.status(200).send(phonebookInfo).end();
+      return res.status(200).send(phonebookInfo).end();
+    });
 });
 
-app.get("/api/persons", (req, res) => res.status(200).send(data).end());
+app.get("/api/persons", (req, res) => {
+  Person.find({})
+    .then((data) => res.status(200).send(data).end())
+    .catch((err) => {
+      console.error("An error occurred: ", err);
+      return res.sendStatus(500);
+    });
+});
 
 app.get("/api/persons/:id", (req, res) => {
   const { id } = req.params;
 
-  const person = data.find((person) => person.id === Number(id));
-
-  if (person) return res.status(200).json(person);
-  return res.sendStatus(404);
+  Person.find({ id })
+    .then((person) => {
+      if (person) return res.status(200).json(person);
+      return res.sendStatus(404);
+    })
+    .catch((err) => {
+      console.error("An error occurred: ", err);
+      return res.sendStatus(500);
+    });
 });
 
 app.post("/api/persons", (req, res) => {
@@ -61,18 +56,22 @@ app.post("/api/persons", (req, res) => {
 
   const { name, number } = body;
 
-  if (data.some((person) => person.name.toLowerCase() === name.toLowerCase()))
-    return res.status(400).json({ error: "name must be unique" });
+  Person.find({ name: { $regex: `^${name}$`, $options: "i" } })
+    .then((data) => {
+      if (data) return res.status(400).json({ error: "name must be unique" });
+    })
+    .then(() => {
+      const person = {
+        name,
+        number,
+      };
 
-  const person = {
-    name,
-    number,
-    id: Math.floor(Math.random() * 99999999999999999),
-  };
-
-  data.push(person);
-
-  return res.json(person);
+      Person.create(person).then((response) => res.status(200).json(response));
+    })
+    .catch((err) => {
+      console.error("An error occurred: ", err);
+      return res.sendStatus(500);
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
