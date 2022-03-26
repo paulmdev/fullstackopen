@@ -49,29 +49,34 @@ app.get("/api/persons/:id", (req, res) => {
     });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const { body } = req;
   if (!body.name || !body.number)
     return res.status(400).json({ error: "Content Missing" });
 
   const { name, number } = body;
 
-  Person.find({ name: { $regex: `^${name}$`, $options: "i" } })
-    .then((data) => {
-      if (data) return res.status(400).json({ error: "name must be unique" });
-    })
-    .then(() => {
-      const person = {
-        name,
-        number,
-      };
-
-      Person.create(person).then((response) => res.status(200).json(response));
-    })
-    .catch((err) => {
-      console.error("An error occurred: ", err);
-      return res.sendStatus(500);
+  try {
+    const existingPersons = await Person.find({
+      name: { $regex: `^${name}$`, $options: "i" },
     });
+
+    console.log(existingPersons);
+
+    if (existingPersons.length) {
+      return res.status(400).json({ error: "name must be unique" });
+    }
+
+    const person = {
+      name,
+      number,
+    };
+
+    const response = await Person.create(person);
+    return res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.delete("/api/persons/:id", (req, res, next) =>
@@ -90,14 +95,14 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, request, response) => {
   console.error(error.message);
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else {
+    return response.sendStatus(500);
   }
-
-  next(error);
 };
 
 app.use(errorHandler);
