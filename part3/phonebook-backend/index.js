@@ -74,19 +74,20 @@ app.post("/api/persons", (req, res) => {
     });
 });
 
-app.delete("/api/persons/:id", (req, res, next) => {
-  const { id } = req.params;
+app.delete("/api/persons/:id", (req, res, next) =>
+  Person.findByIdAndRemove(req.params.id)
+    .then(() => res.status(204).end())
+    .catch((error) => next(error))
+);
 
-  const person = data.find((person) => person.id === id);
-  Person.findByIdAndRemove(id)
-    .then(() => res.status(204).end)
+app.put("/api/persons/:id", (req, res, next) => {
+  const { name, number } = req.body;
+
+  const person = { name, number };
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => res.status(200).json(updatedPerson))
     .catch((error) => next(error));
-
-  if (!person) return res.sendStatus(404);
-
-  data = data.filter((person) => person.id !== id);
-
-  return res.sendStatus(204);
 });
 
 const errorHandler = (error, request, response, next) => {
