@@ -74,10 +74,13 @@ app.post("/api/persons", (req, res) => {
     });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const { id } = req.params;
 
   const person = data.find((person) => person.id === id);
+  Person.findByIdAndRemove(id)
+    .then(() => res.status(204).end)
+    .catch((error) => next(error));
 
   if (!person) return res.sendStatus(404);
 
