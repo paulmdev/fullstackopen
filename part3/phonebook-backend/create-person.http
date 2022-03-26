@@ -1,7 +1,8 @@
+# @name Get all persons
 GET http://localhost:3001/api/persons
 Accept: application/json
 
-###
+### Create a person Sebastian
 POST http://localhost:3001/api/persons
 Content-Type: application/json
 
@@ -10,10 +11,7 @@ Content-Type: application/json
   "number": "30120121221"
 }
 
-###
-DELETE http://localhost:3001/api/persons/1
-
-###
+### Create a person Arto
 POST http://localhost:3001/api/persons
 Content-Type: application/json
 
