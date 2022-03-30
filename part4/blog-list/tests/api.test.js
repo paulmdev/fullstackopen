@@ -61,4 +61,16 @@ describe("when saving a blog post", function () {
   });
 });
 
+test("the likes property defaults to 0 if not provided", async () => {
+  const blogPost = {
+    title: "Atomic Habits",
+    author: "James Clear",
+    url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
+  };
+
+  const response = await api.post("/api/blogs").send(blogPost);
+
+  expect(response.body.likes).toBe(0);
+});
+
 afterAll(() => mongoose.connection.close());
