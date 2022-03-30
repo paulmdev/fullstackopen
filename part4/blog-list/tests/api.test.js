@@ -8,28 +8,32 @@ const api = supertest(app);
 
 beforeAll(async () => {
   await Blog.deleteMany({});
-  const blogObjects = helpers.blogs.map((blog) => new Blog(blog));
-  const promises = blogObjects.map((blog) => blog.save());
-  await Promise.all(promises);
+  await Blog.insertMany(helpers.blogs);
 }, 100000);
 
-test("returns the correct amount of blog post in JSON", async () => {
-  const response = await api
-    .get("/api/blogs")
-    .expect(200)
-    .expect("Content-Type", /application\/json/);
-  expect(response.body).toHaveLength(helpers.blogs.length);
-});
+describe("When getting some blog posts", () => {
+  test("returns the correct amount of blog post in JSON", async () => {
+    const response = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+    expect(response.body).toHaveLength(helpers.blogs.length);
+  });
 
-test("verifies that the unique identifier property is named id", async () => {
-  const response = await api.get("/api/blogs");
+  test("verifies that the unique identifier property is named id", async () => {
+    const response = await api.get("/api/blogs");
 
-  const oneBlog = response.body[0];
+    const oneBlog = response.body[0];
 
-  expect(oneBlog.id).toBeDefined();
+    expect(oneBlog.id).toBeDefined();
+  });
 });
 
 describe("when saving a blog post", function () {
+  afterEach(async () => {
+    await Blog.deleteOne({ title: "Atomic Habits" });
+  });
+
   const blogPost = {
     title: "Atomic Habits",
     author: "James Clear",
@@ -59,18 +63,26 @@ describe("when saving a blog post", function () {
     const titles = blogs.map((blog) => blog.title);
     expect(titles).toContainEqual(blogPost.title);
   });
-});
 
-test("the likes property defaults to 0 if not provided", async () => {
-  const blogPost = {
-    title: "Atomic Habits",
-    author: "James Clear",
-    url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
-  };
+  test("the likes property defaults to 0 if not provided", async () => {
+    const blogPost = {
+      title: "Atomic Habits",
+      author: "James Clear",
+      url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
+    };
 
-  const response = await api.post("/api/blogs").send(blogPost);
+    const response = await api.post("/api/blogs").send(blogPost);
 
-  expect(response.body.likes).toBe(0);
+    expect(response.body.likes).toBe(0);
+  });
+
+  test("the request fails if title and url are missing", async () => {
+    const blogPost = {
+      author: "James Clear",
+    };
+
+    await api.post("/api/blogs").send(blogPost).expect(400);
+  });
 });
 
 afterAll(() => mongoose.connection.close());
