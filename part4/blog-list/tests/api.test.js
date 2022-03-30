@@ -29,4 +29,36 @@ test("verifies that the unique identifier property is named id", async () => {
   expect(oneBlog.id).toBeDefined();
 });
 
+describe("when saving a blog post", function () {
+  const blogPost = {
+    title: "Atomic Habits",
+    author: "James Clear",
+    likes: 99,
+    url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
+  };
+
+  test("it successfully saves", async () => {
+    await api
+      .post("/api/blogs")
+      .send(blogPost)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+  });
+
+  test("the number of blog post is increased by one", async () => {
+    await api.post("/api/blogs").send(blogPost);
+
+    const blogs = await Blog.find({});
+
+    expect(blogs).toHaveLength(helpers.blogs.length + 1);
+  });
+
+  test("the content is saved correctly", async () => {
+    await api.post("/api/blogs").send(blogPost);
+    const blogs = await Blog.find({});
+    const titles = blogs.map((blog) => blog.title);
+    expect(titles).toContainEqual(blogPost.title);
+  });
+});
+
 afterAll(() => mongoose.connection.close());
