@@ -21,4 +21,12 @@ test("returns the correct amount of blog post in JSON", async () => {
   expect(response.body).toHaveLength(helpers.blogs.length);
 });
 
+test("verifies that the unique identifier property is named id", async () => {
+  const response = await api.get("/api/blogs");
+
+  const oneBlog = response.body[0];
+
+  expect(oneBlog.id).toBeDefined();
+});
+
 afterAll(() => mongoose.connection.close());
