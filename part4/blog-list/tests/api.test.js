@@ -85,4 +85,38 @@ describe("when saving a blog post", function () {
   });
 });
 
+describe("When modifying a blog post", () => {
+  test("increments the like count successfully", async () => {
+    const { _id, title, likes } = helpers.listWithOneBlog[0];
+    await api
+      .put(`/api/blogs/${_id}`)
+      .send({ likes: likes + 1 })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const blog = await Blog.find({ title });
+
+    expect(blog[0].likes).toBe(likes + 1);
+  });
+
+  test("fails if likes is undefined", async () => {
+    const { _id, title } = helpers.listWithOneBlog[0];
+    await api.put(`/api/blogs/${_id}`).send({ title }).expect(400);
+  });
+});
+
+describe("When deleting a blog post", () => {
+  test("deletes successfully", async () => {
+    const { _id, title } = helpers.listWithOneBlog[0];
+    await api.delete(`/api/blogs/${_id}`).expect(204);
+
+    const blogs = await Blog.find({});
+
+    expect(blogs).toHaveLength(helpers.blogs.length - 1);
+
+    const titles = blogs.map((blog) => blog.title);
+    expect(titles).not.toContain(title);
+  });
+});
+
 afterAll(() => mongoose.connection.close());
