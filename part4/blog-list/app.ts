@@ -1,17 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
 require("express-async-errors");
+import mongoose from "mongoose";
+import cors from "cors";
+import express from "express";
 
-const config = require("./utils/config");
-const logger = require("./utils/logger");
-const middleware = require("./utils/middleware");
-const blogRouter = require("./controller/blogs");
-
+import config from "./utils/config";
+import middleware from "./utils/middleware";
+import logger from "./utils/logger";
+import blogRouter from "./controller/blogs";
 const app = express();
 
 mongoose
-  .connect(config.MONGODB_URI)
+  .connect(config.MONGODB_URI ?? "")
   .then(() => {
     logger.info("connected to MongoDB");
   })
@@ -29,4 +28,4 @@ app.use("/api/blogs", blogRouter);
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
-module.exports = app;
+export default app;

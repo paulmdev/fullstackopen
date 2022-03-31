@@ -60,4 +60,4 @@ const blogs = [
   },
 ];
 
-module.exports = { blogs, listWithOneBlog };
+export default { blogs, listWithOneBlog };

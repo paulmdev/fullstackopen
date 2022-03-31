@@ -1,7 +1,14 @@
 /* eslint-disable no-param-reassign,no-underscore-dangle */
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const blogSchema = new mongoose.Schema({
+export interface Blog {
+  title: string;
+  author: string;
+  url: string;
+  likes: number;
+}
+
+const blogSchema = new mongoose.Schema<Blog>({
   title: {
     required: true,
     type: String,
@@ -21,11 +28,11 @@ const blogSchema = new mongoose.Schema({
 });
 
 blogSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
+  transform: (_document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
   },
 });
 
-module.exports = mongoose.model("Blog", blogSchema);
+export default mongoose.model<Blog>("Blog", blogSchema);

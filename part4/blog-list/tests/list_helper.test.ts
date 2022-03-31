@@ -1,10 +1,10 @@
-const {
-  totalLikes,
+import {
   favoriteBlog,
   mostBlogs,
   mostLikes,
-} = require("../utils/list_helper");
-const helpers = require("./test_helpers");
+  totalLikes,
+} from "../utils/list_helper";
+import helpers from "./test_helpers";
 
 describe("total likes", () => {
   test("of empty list is 0", () => {

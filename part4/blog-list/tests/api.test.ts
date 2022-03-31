@@ -1,8 +1,8 @@
-const app = require("../app");
-const Blog = require("../models/blog");
-const supertest = require("supertest");
-const mongoose = require("mongoose");
-const helpers = require("./test_helpers");
+import supertest from "supertest";
+import mongoose from "mongoose";
+import app from "../app";
+import Blog from "../models/blog";
+import helpers from "./test_helpers";
 
 const api = supertest(app);
 

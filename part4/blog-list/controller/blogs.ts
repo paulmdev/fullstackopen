@@ -1,7 +1,10 @@
-const router = require("express").Router();
-const Blog = require("../models/blog");
+import { Router } from "express";
 
-router.get("/", async (request, response) => {
+import Blog from "../models/blog";
+
+const router = Router();
+
+router.get("/", async (_request, response) => {
   const blogs = await Blog.find({});
   return response.json(blogs);
 });
@@ -32,4 +35,4 @@ router.put("/:id", async (req, res) => {
   return res.json(updatedBlog);
 });
 
-module.exports = router;
+export default router;

@@ -1,21 +1,24 @@
-const lodash = require("lodash");
+import lodash from "lodash";
+import { Blog } from "../models/blog";
 
-const totalLikes = (blogs) => {
-  const reducer = (likes, blog) => blog.likes + likes;
+const totalLikes = (blogs: Blog[]) => {
+  const reducer = (likes: number, blog: Blog) => blog.likes + likes;
   return blogs.length === 0 ? 0 : blogs.reduce(reducer, 0);
 };
 
-const favoriteBlog = (blogs) => {
+const favoriteBlog = (blogs: Blog[]) => {
   if (blogs.length === 0) return undefined;
 
-  const maximumLikes = Math.max(...blogs.map((blog) => blog.likes));
-  const { likes, title, author } = blogs.find(
-    (blog) => blog.likes === maximumLikes
-  );
+  const foundBlog = lodash.maxBy(blogs, "likes");
+
+  if (!foundBlog) return;
+
+  const { likes, title, author } = foundBlog;
+
   return { likes, title, author };
 };
 
-const mostBlogs = (blogs) => {
+const mostBlogs = (blogs: Blog[]) => {
   if (blogs.length === 0) return undefined;
 
   const countBlogsByAuthor = lodash.countBy(blogs, "author");
@@ -28,7 +31,7 @@ const mostBlogs = (blogs) => {
   return lodash.maxBy(blogsByAuthor, "blogs");
 };
 
-const mostLikes = (blogs) => {
+const mostLikes = (blogs: Blog[]) => {
   if (blogs.length === 0) return undefined;
 
   const groupByAuthor = lodash.groupBy(blogs, "author");
@@ -41,9 +44,4 @@ const mostLikes = (blogs) => {
   return lodash.maxBy(aggregatedLikes, "likes");
 };
 
-module.exports = {
-  totalLikes,
-  favoriteBlog,
-  mostBlogs,
-  mostLikes,
-};
+export { totalLikes, favoriteBlog, mostBlogs, mostLikes };
