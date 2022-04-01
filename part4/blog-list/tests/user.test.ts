@@ -14,6 +14,21 @@ describe("When theres only one user", () => {
     await rootUser.save();
   }, 100000);
 
+  test("it gets just the desired parameters", async () => {
+    const response = await api
+      .get("/api/users")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    expect(response.body.length).toBe(1);
+    expect(response.body).toContainEqual({
+      username: "root",
+      name: "root",
+      id: expect.any(String),
+      blogs: [],
+    });
+  });
+
   test("A new user can be added", async () => {
     const prevUsers = await helpers.usersInDb();
 

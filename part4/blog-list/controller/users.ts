@@ -4,6 +4,11 @@ import User from "../models/user";
 
 const router = Router();
 
+router.get("/", async (_request, response) => {
+  const users = await User.find({});
+  return response.json(users);
+});
+
 router.post("/", async (request, response) => {
   const { username, name, password } = request.body;
 
