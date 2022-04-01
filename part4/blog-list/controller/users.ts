@@ -7,6 +7,11 @@ const router = Router();
 router.post("/", async (request, response) => {
   const { username, name, password } = request.body;
 
+  const duplicatedUser = await User.find({ username });
+
+  if (duplicatedUser)
+    return response.status(400).json({ error: "username must be unique" });
+
   const salt = 10;
 
   const passwordHash = await bcrypt.hash(password, salt);
