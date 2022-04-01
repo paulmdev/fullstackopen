@@ -7,7 +7,7 @@ export interface Blog {
   author: string;
   url: string;
   likes: number;
-  user: User;
+  user: User | string;
 }
 
 const blogSchema = new mongoose.Schema<Blog>({

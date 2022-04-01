@@ -5,7 +5,7 @@ export interface User {
   username: string;
   name: string;
   passwordHash: string;
-  blogs: Blog[];
+  blogs: Blog[] | string[];
 }
 
 const userSchema = new mongoose.Schema<User>({
