@@ -12,6 +12,13 @@ router.get("/", async (_request, response) => {
 router.post("/", async (request, response) => {
   const { username, name, password } = request.body;
 
+  if (username.length <= 3 || password.length <= 3)
+    return response.status(400).json({
+      error: `${
+        username.length <= 3 ? "username" : "password"
+      } must have more than 3 characters`,
+    });
+
   const duplicatedUsername = await User.find({ username });
 
   if (duplicatedUsername.length)
