@@ -6,6 +6,8 @@ import app from "../app";
 
 const api = supertest(app);
 
+const ENDPOINT = "/api/users";
+
 describe("When theres only one user", () => {
   beforeEach(async () => {
     await User.deleteMany({});
@@ -16,7 +18,7 @@ describe("When theres only one user", () => {
 
   test("it gets just the desired parameters", async () => {
     const response = await api
-      .get("/api/users")
+      .get(ENDPOINT)
       .expect(200)
       .expect("Content-Type", /application\/json/);
 
@@ -39,7 +41,7 @@ describe("When theres only one user", () => {
     };
 
     await api
-      .post("/api/users")
+      .post(ENDPOINT)
       .send(user)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -59,7 +61,7 @@ describe("When theres only one user", () => {
     };
 
     const response = await api
-      .post("/api/users")
+      .post(ENDPOINT)
       .send(user)
       .expect(400)
       .expect("Content-Type", /application\/json/);
@@ -75,5 +77,35 @@ describe("When theres only one user", () => {
     const prevUsers = await helpers.usersInDb();
 
     expect(prevUsers[0].passwordHash).not.toBeDefined();
+  });
+});
+
+describe("Creating a new user fails if", () => {
+  test("The username has 3 or less characters long", async () => {
+    const user = { username: "dud", name: "fail", password: "abcde12345" };
+
+    const response = await api
+      .post(ENDPOINT)
+      .send(user)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    expect(response.body.error).toBe(
+      "username must have more than 3 characters"
+    );
+  });
+
+  test("The password has 3 or less characters long", async () => {
+    const user = { username: "dude", name: "fail", password: "abc" };
+
+    const response = await api
+      .post(ENDPOINT)
+      .send(user)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    expect(response.body.error).toBe(
+      "password must have more than 3 characters"
+    );
   });
 });
