@@ -3,11 +3,14 @@ import mongoose from "mongoose";
 import app from "../app";
 import Blog from "../models/blog";
 import helpers from "./test_helpers";
+import User from "../models/user";
 
 const api = supertest(app);
 
 beforeAll(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
+  await User.insertMany(helpers.users);
   await Blog.insertMany(helpers.blogs);
 }, 100000);
 
@@ -38,6 +41,7 @@ describe("when saving a blog post", function () {
     title: "Atomic Habits",
     author: "James Clear",
     likes: 99,
+    user: "62467482bc65362b82563f80",
     url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
   };
 
@@ -68,6 +72,7 @@ describe("when saving a blog post", function () {
     const blogPost = {
       title: "Atomic Habits",
       author: "James Clear",
+      user: "62467482bc65362b82563f80",
       url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
     };
 
