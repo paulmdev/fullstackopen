@@ -7,9 +7,9 @@ const router = Router();
 router.post("/", async (request, response) => {
   const { username, name, password } = request.body;
 
-  const duplicatedUser = await User.find({ username });
+  const duplicatedUsername = await User.find({ username });
 
-  if (duplicatedUser)
+  if (duplicatedUsername.length)
     return response.status(400).json({ error: "username must be unique" });
 
   const salt = 10;
