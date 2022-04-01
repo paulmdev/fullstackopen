@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema<User>({
     type: String,
     unique: true,
   },
-  blogs: [{ type: mongoose.Types.ObjectId, ref: "Blog" }],
+  blogs: [{ type: mongoose.Types.ObjectId, ref: "Blog", default: [] }],
 });
 
 userSchema.set("toJSON", {
