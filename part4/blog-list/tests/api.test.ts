@@ -30,16 +30,6 @@ describe("When getting some blog posts", () => {
 
     expect(oneBlog.id).toBeDefined();
   });
-
-  test("the users are populated", async () => {
-    const response = await api.get(ENDPOINT);
-
-    expect(response.body.user).toContainEqual({
-      username: expect.any(String),
-      name: expect.any(String),
-      id: expect.any(String),
-    });
-  });
 });
 
 const ENDPOINT = "/api/blogs";
