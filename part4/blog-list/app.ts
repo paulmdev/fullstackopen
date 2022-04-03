@@ -8,6 +8,7 @@ import middleware from "./utils/middleware";
 import logger from "./utils/logger";
 import blogRouter from "./controller/blogs";
 import userRouter from "./controller/users";
+import loginRouter from "./controller/login";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(middleware.requestLogger);
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
+app.use("/api/login", loginRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
