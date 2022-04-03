@@ -31,6 +31,46 @@ describe("When theres only one user", () => {
     });
   });
 
+  test("the blogs are populated", async () => {
+    const blogs = [
+      {
+        title: "React patterns",
+        author: "Michael Chan",
+        url: "https://reactpatterns.com/",
+        likes: 7,
+        __v: 0,
+      },
+      {
+        title: "Go To Statement Considered Harmful",
+        author: "Edsger W. Dijkstra",
+        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+        likes: 5,
+        __v: 0,
+      },
+      {
+        title: "Canonical string reduction",
+        author: "Edsger W. Dijkstra",
+        url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+        likes: 12,
+        __v: 0,
+      },
+    ];
+
+    const promises = blogs.map((blog) => api.post("/api/blogs").send(blog));
+
+    await Promise.all(promises);
+
+    const response = await api.get(ENDPOINT);
+
+    expect(response.body.blogs).toHaveLength(blogs.length);
+    expect(response.body.blogs).toContainEqual({
+      url: expect.any(String),
+      title: expect.any(String),
+      author: expect.any(String),
+      id: expect.any(String),
+    });
+  });
+
   test("A new user can be added", async () => {
     const prevUsers = await helpers.usersInDb();
 
