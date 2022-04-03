@@ -17,14 +17,14 @@ beforeAll(async () => {
 describe("When getting some blog posts", () => {
   test("returns the correct amount of blog post in JSON", async () => {
     const response = await api
-      .get("/api/blogs")
+      .get(ENDPOINT)
       .expect(200)
       .expect("Content-Type", /application\/json/);
     expect(response.body).toHaveLength(helpers.blogs.length);
   });
 
   test("verifies that the unique identifier property is named id", async () => {
-    const response = await api.get("/api/blogs");
+    const response = await api.get(ENDPOINT);
 
     const oneBlog = response.body[0];
 
@@ -32,6 +32,7 @@ describe("When getting some blog posts", () => {
   });
 });
 
+const ENDPOINT = "/api/blogs";
 describe("when saving a blog post", function () {
   afterEach(async () => {
     await Blog.deleteOne({ title: "Atomic Habits" });
@@ -47,14 +48,14 @@ describe("when saving a blog post", function () {
 
   test("it successfully saves", async () => {
     await api
-      .post("/api/blogs")
+      .post(ENDPOINT)
       .send(blogPost)
       .expect(201)
       .expect("Content-Type", /application\/json/);
   });
 
   test("the number of blog post is increased by one", async () => {
-    await api.post("/api/blogs").send(blogPost);
+    await api.post(ENDPOINT).send(blogPost);
 
     const blogs = await Blog.find({});
 
@@ -62,7 +63,7 @@ describe("when saving a blog post", function () {
   });
 
   test("the content is saved correctly", async () => {
-    await api.post("/api/blogs").send(blogPost);
+    await api.post(ENDPOINT).send(blogPost);
     const blogs = await Blog.find({});
     const titles = blogs.map((blog) => blog.title);
     expect(titles).toContainEqual(blogPost.title);
@@ -76,7 +77,7 @@ describe("when saving a blog post", function () {
       url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
     };
 
-    const response = await api.post("/api/blogs").send(blogPost);
+    const response = await api.post(ENDPOINT).send(blogPost);
 
     expect(response.body.likes).toBe(0);
   });
@@ -86,7 +87,24 @@ describe("when saving a blog post", function () {
       author: "James Clear",
     };
 
-    await api.post("/api/blogs").send(blogPost).expect(400);
+    await api.post(ENDPOINT).send(blogPost).expect(400);
+  });
+
+  test("whose user is unknown, it assigns any user to the blog.", async () => {
+    const blogPost = {
+      title: "Atomic Habits",
+      author: "James Clear",
+      likes: 99,
+      url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
+    };
+
+    const response = await api
+      .post(ENDPOINT)
+      .send(blogPost)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    expect(response.body.user).toBeDefined();
   });
 });
 
@@ -94,7 +112,7 @@ describe("When modifying a blog post", () => {
   test("increments the like count successfully", async () => {
     const { _id, title, likes } = helpers.listWithOneBlog[0];
     await api
-      .put(`/api/blogs/${_id}`)
+      .put(`${ENDPOINT}/${_id}`)
       .send({ likes: likes + 1 })
       .expect(200)
       .expect("Content-Type", /application\/json/);
@@ -106,14 +124,14 @@ describe("When modifying a blog post", () => {
 
   test("fails if likes is undefined", async () => {
     const { _id, title } = helpers.listWithOneBlog[0];
-    await api.put(`/api/blogs/${_id}`).send({ title }).expect(400);
+    await api.put(`${ENDPOINT}/${_id}`).send({ title }).expect(400);
   });
 });
 
 describe("When deleting a blog post", () => {
   test("deletes successfully", async () => {
     const { _id, title } = helpers.listWithOneBlog[0];
-    await api.delete(`/api/blogs/${_id}`).expect(204);
+    await api.delete(`${ENDPOINT}/${_id}`).expect(204);
 
     const blogs = await Blog.find({});
 
