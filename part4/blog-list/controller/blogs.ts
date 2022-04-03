@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import Blog from "../models/blog";
+import User from "../models/user";
 
 const router = Router();
 
@@ -10,7 +11,16 @@ router.get("/", async (_request, response) => {
 });
 
 router.post("/", async (request, response) => {
-  const blog = new Blog(request.body);
+  let { user } = request.body;
+
+  // Gets the id of any user if the user is not provided in the request.
+  user ??= (await User.findOne())?.id;
+
+  const blog = new Blog({
+    ...request.body,
+    user,
+  });
+
   const result = await blog.save();
   response.status(201).json(result);
 });
