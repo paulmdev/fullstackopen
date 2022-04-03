@@ -22,6 +22,7 @@ router.post("/", async (request, response) => {
   });
 
   const result = await blog.save();
+  await User.findByIdAndUpdate(user, { $push: { blogs: result.id } });
   response.status(201).json(result);
 });
 
