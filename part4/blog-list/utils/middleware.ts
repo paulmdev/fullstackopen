@@ -1,5 +1,6 @@
 import logger from "./logger";
 import { NextFunction, Request, Response, RequestHandler } from "express";
+import { CustomRequest } from "../types/CustomHandler";
 
 const requestLogger: RequestHandler = (request, _response, next) => {
   logger.info("Method:", request.method);
@@ -32,4 +33,18 @@ const errorHandler = (
   next(error);
 };
 
-export default { errorHandler, requestLogger, unknownEndpoint };
+const tokenExtractor: RequestHandler = (
+  request: CustomRequest,
+  _response,
+  next
+) => {
+  const authorization = request.get("authorization");
+
+  if (authorization && authorization.match(/bearer\s.*/i)) {
+    request.token = authorization.substring(7);
+  }
+
+  next();
+};
+
+export default { errorHandler, requestLogger, unknownEndpoint, tokenExtractor };

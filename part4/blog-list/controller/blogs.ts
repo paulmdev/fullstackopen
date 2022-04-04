@@ -1,9 +1,10 @@
-import { Request, Router } from "express";
+import { Router } from "express";
 import jwt from "jsonwebtoken";
 
 import Blog from "../models/blog";
 import User from "../models/user";
 import config from "../utils/config";
+import { CustomRequest } from "../types/CustomHandler";
 
 const router = Router();
 
@@ -17,22 +18,11 @@ router.get("/", async (_request, response) => {
   return response.json(blogs);
 });
 
-const getTokenFrom = (request: Request) => {
-  const authorization = request.get("authorization");
-
-  if (authorization && authorization.match(/bearer\s.*/i)) {
-    return authorization.substring(7);
-  }
-  return null;
-};
-
-router.post("/", async (request, response) => {
-  const token = getTokenFrom(request);
-
-  if (!token)
+router.post("/", async (request: CustomRequest, response) => {
+  if (!request.token)
     return response.status(400).json({ error: "invalid or missing token" });
 
-  const decodedUser = jwt.verify(token, config.SECRET!) as {
+  const decodedUser = jwt.verify(request.token, config.SECRET!) as {
     id: string;
     name: string;
     username: string;
