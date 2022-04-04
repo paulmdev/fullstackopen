@@ -1,4 +1,5 @@
 import User from "../models/user";
+import supertest from "supertest";
 
 const listWithOneBlog = [
   {
@@ -46,7 +47,7 @@ const users = [
     username: "jclear",
     name: "James Clear",
     passwordHash:
-      "$2y$10$.1rLx58HpPp0qrOVPi2XaODl/Rbrep/JVC7JIarsEIVy2C6gm6rsO",
+      "$2a$12$E4qg1inM5.so7D21I38vCOcoy8IF620A4E0ul3AQW3F/Q94xHVnAe",
     blogs: [],
   },
 ];
@@ -113,4 +114,22 @@ const usersInDb = async () => {
   return users.map((user) => user.toJSON());
 };
 
-export default { blogs, listWithOneBlog, users, usersInDb };
+const getAuthToken = async (
+  api: supertest.SuperTest<supertest.Test>,
+  username: string,
+  password: string
+) => {
+  const response = await api.post("/api/login").send({ username, password });
+
+  const { token } = response.body;
+
+  return token;
+};
+
+export default {
+  blogs,
+  listWithOneBlog,
+  users,
+  usersInDb,
+  logUserIn: getAuthToken,
+};

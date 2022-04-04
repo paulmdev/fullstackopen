@@ -47,15 +47,23 @@ describe("when saving a blog post", function () {
   };
 
   test("it successfully saves", async () => {
+    const token = await helpers.logUserIn(api, "jclear", "password");
+
     await api
       .post(ENDPOINT)
+      .set("Authorization", `Bearer ${token}`)
       .send(blogPost)
       .expect(201)
       .expect("Content-Type", /application\/json/);
   });
 
   test("the number of blog post is increased by one", async () => {
-    await api.post(ENDPOINT).send(blogPost);
+    const token = await helpers.logUserIn(api, "jclear", "password");
+
+    await api
+      .post(ENDPOINT)
+      .send(blogPost)
+      .set("Authorization", `Bearer ${token}`);
 
     const blogs = await Blog.find({});
 
@@ -63,7 +71,11 @@ describe("when saving a blog post", function () {
   });
 
   test("the content is saved correctly", async () => {
-    await api.post(ENDPOINT).send(blogPost);
+    const token = await helpers.logUserIn(api, "jclear", "password");
+    await api
+      .post(ENDPOINT)
+      .send(blogPost)
+      .set("Authorization", `Bearer ${token}`);
     const blogs = await Blog.find({});
     const titles = blogs.map((blog) => blog.title);
     expect(titles).toContainEqual(blogPost.title);
@@ -77,7 +89,12 @@ describe("when saving a blog post", function () {
       url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
     };
 
-    const response = await api.post(ENDPOINT).send(blogPost);
+    const token = await helpers.logUserIn(api, "jclear", "password");
+
+    const response = await api
+      .post(ENDPOINT)
+      .set("Authorization", `Bearer ${token}`)
+      .send(blogPost);
 
     expect(response.body.likes).toBe(0);
   });
@@ -87,10 +104,16 @@ describe("when saving a blog post", function () {
       author: "James Clear",
     };
 
-    await api.post(ENDPOINT).send(blogPost).expect(400);
+    const token = await helpers.logUserIn(api, "jclear", "password");
+
+    await api
+      .post(ENDPOINT)
+      .send(blogPost)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(400);
   });
 
-  test("whose user is unknown, it assigns any user to the blog.", async () => {
+  test("it saves with its user", async () => {
     const blogPost = {
       title: "Atomic Habits",
       author: "James Clear",
@@ -98,8 +121,11 @@ describe("when saving a blog post", function () {
       url: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
     };
 
+    const token = await helpers.logUserIn(api, "jclear", "password");
+
     const response = await api
       .post(ENDPOINT)
+      .set("Authorization", `Bearer ${token}`)
       .send(blogPost)
       .expect(201)
       .expect("Content-Type", /application\/json/);
