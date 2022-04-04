@@ -1,7 +1,9 @@
-import { Router } from "express";
+import { Request, Router } from "express";
+import jwt from "jsonwebtoken";
 
 import Blog from "../models/blog";
 import User from "../models/user";
+import config from "../utils/config";
 
 const router = Router();
 
@@ -15,20 +17,38 @@ router.get("/", async (_request, response) => {
   return response.json(blogs);
 });
 
-router.post("/", async (request, response) => {
-  let { user } = request.body;
+const getTokenFrom = (request: Request) => {
+  const authorization = request.get("authorization");
 
-  // Gets the id of any user if the user is not provided in the request.
-  user ??= (await User.findOne())?.id;
+  if (authorization && authorization.match(/bearer\s.*/i)) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
+router.post("/", async (request, response) => {
+  const token = getTokenFrom(request);
+
+  if (!token)
+    return response.status(400).json({ error: "invalid or missing token" });
+
+  const decodedUser = jwt.verify(token, config.SECRET!) as {
+    id: string;
+    name: string;
+    username: string;
+  };
+
+  if (!decodedUser.id)
+    return response.status(400).json({ error: "invalid or missing token" });
 
   const blog = new Blog({
     ...request.body,
-    user,
+    user: decodedUser.id,
   });
-
   const result = await blog.save();
-  await User.findByIdAndUpdate(user, { $push: { blogs: result.id } });
-  response.status(201).json(result);
+
+  await User.findByIdAndUpdate(decodedUser.id, { $push: { blogs: result.id } });
+  return response.status(201).json(result);
 });
 
 router.delete("/:id", async (req, res) => {
